@@ -21,7 +21,7 @@
   </div>
 </template>
 <script>
-import Select from "./select.vue";
+import Select from "../common/components/select.vue";
 export default {
   data() {
     return {

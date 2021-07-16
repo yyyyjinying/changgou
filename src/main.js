@@ -3,16 +3,8 @@
 import Vue from "vue";
 import App from "./App";
 import router from "./router";
-import { i18n } from "common/lang/index";
-import Element from "element-ui";
-import "element-ui/lib/theme-chalk/index.css";
+import { i18n } from "common/components/element-ui";
 import "common/stylus/index.styl";
-
-Vue.use(Element, {
-  size: "small",
-  zIndex: 3000,
-  i18n: (key, value) => i18n.t(key, value)
-});
 
 Vue.config.productionTip = false;
 
