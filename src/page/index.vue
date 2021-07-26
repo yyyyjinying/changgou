@@ -5,28 +5,63 @@
     </div>
     <div class="container">
       <div class="slide">
-        <!-- <el-row>
-          <el-button>默认按钮</el-button>
-          <el-button type="primary">主要按钮</el-button>
-          <el-button type="success">成功按钮</el-button>
-          <el-button type="info">信息按钮</el-button>
-          <el-button type="warning">警告按钮</el-button>
-          <el-button type="danger">危险按钮</el-button>
-        </el-row> -->
+        <el-tree
+          :data="categoryData"
+          :props="defaultProps"
+          accordion
+          @node-click="handleNodeClick"
+        >
+        </el-tree>
       </div>
       <div class="warp">
-        <span>{{ $t("message") }}</span>
+        <ul>
+          <li class="cLi">1</li>
+          <li class="cLi">2</li>
+          <li class="cLi">3</li>
+        </ul>
+        <router-view />
       </div>
     </div>
   </div>
 </template>
 <script>
-import Select from "../common/components/select.vue";
+import Select from "../common/components/base/select.vue";
+import { Request } from "common/utils";
 export default {
   data() {
     return {
-      aa: "aa"
+      categoryData: [
+        {
+          name: "系统首页"
+        },
+        {
+          name: "一级 2",
+          children: [
+            {
+              name: "二级 2-1"
+            }
+          ]
+        }
+      ],
+      defaultProps: {
+        children: "children",
+        label: "name"
+      }
     };
+  },
+  methods: {
+    handleNodeClick(data) {
+      console.log(data);
+    },
+    async categoryRequest() {
+      const res = await Request.get("category/tree/0");
+      if (res.data.code === 20000) {
+        this.categoryData = res.data.data;
+      }
+    }
+  },
+  mounted() {
+    this.categoryRequest();
   },
   components: {
     Select
@@ -45,7 +80,8 @@ export default {
     display:flex;
     flex-direction:row;
     .slide{
-      width: 400px;
+      width: 200px;
+      border-right:1px solid #ccc;
     }
     .warp{
       flex:1;

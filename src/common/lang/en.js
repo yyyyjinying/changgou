@@ -1,3 +1,3 @@
 export default {
-  message: "hello"
+  message: "hello{0} world"
 };
