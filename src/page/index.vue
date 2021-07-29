@@ -6,7 +6,7 @@
     <div class="container">
       <div class="slide">
         <el-tree
-          :data="categoryData"
+          :data="menuData"
           :props="defaultProps"
           accordion
           @node-click="handleNodeClick"
@@ -14,11 +14,6 @@
         </el-tree>
       </div>
       <div class="warp">
-        <ul>
-          <li class="cLi">1</li>
-          <li class="cLi">2</li>
-          <li class="cLi">3</li>
-        </ul>
         <router-view />
       </div>
     </div>
@@ -30,15 +25,104 @@ import { Request } from "common/utils";
 export default {
   data() {
     return {
-      categoryData: [
+      categoryData: [],
+      menuData: [
         {
-          name: "系统首页"
+          name: "首页"
         },
         {
-          name: "一级 2",
+          name: "商品",
           children: [
             {
-              name: "二级 2-1"
+              name: "商品列表",
+              children: [
+                {
+                  name: "商品列表"
+                },
+                {
+                  name: "商品日志"
+                }
+              ]
+            },
+            {
+              name: "添加商品",
+              path: "goods",
+              children: [
+                {
+                  name: "选择商品分类",
+                  path: "/goods/category"
+                },
+                {
+                  name: "填写商品信息",
+                  path: "/goods/baseInfo"
+                },
+                {
+                  name: "填写商品属性",
+                  path: "/goods/attr"
+                }
+              ]
+            },
+            {
+              name: "商品分类",
+              children: [
+                {
+                  name: "商品分类"
+                },
+                {
+                  name: "二级分类"
+                },
+                {
+                  name: "三级分类"
+                },
+                {
+                  name: "添加分类"
+                }
+              ]
+            },
+            {
+              name: "规格参数模版",
+              children: [
+                {
+                  name: "规格参数"
+                },
+                {
+                  name: "规格列表"
+                },
+                {
+                  name: "参数列表"
+                },
+                {
+                  name: "添加规格"
+                },
+                {
+                  name: "添加参数"
+                }
+              ]
+            },
+            {
+              name: "品牌管理",
+              children: [
+                {
+                  name: "品牌管理"
+                },
+                {
+                  name: "添加新品牌"
+                }
+              ]
+            },
+            {
+              name: "图片库管理",
+              children: [
+                {
+                  name: "图片库管理"
+                },
+                {
+                  name: "相册列表"
+                },
+                {
+                  name: "新建相册"
+                }
+              ]
             }
           ]
         }
@@ -51,7 +135,7 @@ export default {
   },
   methods: {
     handleNodeClick(data) {
-      console.log(data);
+      data.path && this.$router.push(data.path);
     },
     async categoryRequest() {
       const res = await Request.get("category/tree/0");

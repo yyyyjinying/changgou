@@ -6,6 +6,12 @@ import router from "./router";
 import { i18n } from "common/components/element-ui";
 import "common/stylus/index.styl";
 
+// 导入富文本编辑器样式
+import "quill/dist/quill.core.css";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
+// import Quill from "quill";
+
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
