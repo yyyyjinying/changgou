@@ -10,9 +10,13 @@
       v-if="active == 1"
       @prev="prev"
       :categoryIdArrs="categoryIdArrs"
+      ref="baseInfoRef"
     />
-    <goods-attr v-if="active == 2" :categoryId="560" />
-    <!-- <goods-attr v-if="active == 2" :categoryId="categoryIdArrs[2].id" /> -->
+    <goods-attr
+      ref="goodsAttrRef"
+      v-if="active == 2"
+      :categoryId="categoryIdArrs[2].id"
+    />
     <div class="footer">
       <el-button v-if="active !== 0" type="host" @click="prev"
         >上一步</el-button
@@ -29,12 +33,25 @@ export default {
   data() {
     return {
       active: 2,
-      categoryIdArrs: []
+      categoryIdArrs: [
+        // 设置初始值用于调试
+        { id: 558, name: "手机" },
+        { id: 559, name: "手机通讯 " },
+        { id: 560, name: "手机" }
+      ],
+      baseInfo: {}, // spu数据
+      goodsAttr: {} // sku数据
     };
   },
   methods: {
     next() {
-      if (this.active === 2) return;
+      if (this.active === 2) {
+        this.goodsAttr = this.$refs.goodsAttrRef.getFromData();
+        return;
+      }
+      if (this.active === 1) {
+        this.baseInfo = this.$refs.baseInfoRef.getFromData();
+      }
       this.active = this.active + 1;
     },
     prev() {

@@ -2,7 +2,10 @@
   <div>
     <el-form class="form" ref="form" :model="form" label-width="200px">
       <el-form-item label="规格参数数组">
-        <el-input v-model="templateName" placeholder="请输入内容"></el-input>
+        <el-input
+          v-model="form.templateName"
+          placeholder="请输入内容"
+        ></el-input>
       </el-form-item>
       <div>
         <!-- 商品规格 -->
@@ -18,35 +21,35 @@
               :key="idx"
               :label="cItem"
               :name="String(item.id)"
+              @change="checkboxClick(item)"
             ></el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <!-- 规格配置 -->
-        <el-table border :data="tableData" style="width: 100%">
-          <el-table-column prop="name" label="尺码" width="80">
-          </el-table-column>
-          <el-table-column prop="name" label="颜色" width="80">
-          </el-table-column>
-          <el-table-column label=" 销售价格" width="180">
-            <template slot-scope="scope">
-              <el-input
-                v-model="scope.row.date"
-                placeholder="请输入内容"
-              ></el-input>
+        <!-- <table border="1">
+          <tr>
+            <template v-for="item in specTableColumns">
+              <th :key="item.value" width="80">{{ item.name }}</th>
             </template>
+            <th>操作</th>
+          </tr>
+          <tr v-for="(item, index) in specTableData" :key="index">
+            <td v-for="(v, k) in item" :key="k">{{ v }}</td>
+            <td>+</td>
+          </tr>
+        </table> -->
+        <el-table border :data="specTableData">
+          <el-table-column
+            v-for="(item, index) in specTableColumns"
+            :key="index"
+            :prop="item.value"
+            :label="item.name"
+          >
           </el-table-column>
           <el-table-column label="商品库存" width="180">
             <template slot-scope="scope">
               <el-input
-                v-model="scope.row.date"
-                placeholder="请输入内容"
-              ></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label=" 库存预警值" width="180">
-            <template slot-scope="scope">
-              <el-input
-                v-model="scope.row.address"
+                v-model="scope.row.number"
                 placeholder="请输入内容"
               ></el-input>
             </template>
@@ -62,6 +65,7 @@
             </template>
           </el-table-column>
         </el-table>
+
         <!-- 商品参数  -->
         <h1>商品参数</h1>
         <el-table border :data="paraLists" style="width: 100%">
@@ -96,7 +100,7 @@
   </div>
 </template>
 <script>
-import { Request } from "common/utils";
+import { Request, combinationCalculate } from "common/utils";
 import VEditor from "common/components/base/vEditor";
 
 export default {
@@ -108,46 +112,12 @@ export default {
   },
   data() {
     return {
-      templateName: "",
       specLists: [],
       paraLists: [],
-      specData: [
-        {
-          typeName: "上市年份",
-          typeValue: "2012-03-06"
-        }
-      ],
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄"
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄"
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄"
-        }
-      ],
+      specTableData: [],
+      specTableColumns: [],
       form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
+        templateName: ""
       }
     };
   },
@@ -158,9 +128,44 @@ export default {
     prev() {
       this.$emit("prev");
     },
-    onSubmit() {
-      //   const aa = this.form;
-      debugger;
+    checkboxClick() {
+      this.setSpecTableData();
+      // let specTableColumns = [];
+      // this.specLists.forEach((item, index) => {
+      //   if (item.values.length > 0) {
+      //     specTableColumns.push({
+      //       value: `attr${index}`,
+      //       name: item.name
+      //     });
+      //   }
+      // });
+      // this.specTableColumns = specTableColumns;
+    },
+    setSpecTableData() {
+      let specTableColumns = [];
+      let specArrs = this.specLists
+        .map((item, index) => {
+          item.values.length > 0 &&
+            specTableColumns.push({
+              value: `attr${index}`,
+              name: item.name
+            });
+          return item.values.map(v => {
+            return { [`attr${index}`]: v };
+          });
+        })
+        .filter(item => item.length > 0);
+      this.specTableColumns = specTableColumns;
+      this.specTableData = combinationCalculate(specArrs);
+    },
+    getFromData() {
+      const templateName = this.form.templateName;
+      const aa = {
+        templateName,
+        specLists: this.specLists,
+        paraLists: this.paraLists
+      };
+      console.log(aa);
     },
     async findTemplateName() {
       const res = await Request.get("template/category/" + this.categoryId);
@@ -190,6 +195,7 @@ export default {
   components: {
     VEditor
   },
+
   mounted() {
     this.findSpecLists();
     this.findTemplateName();
