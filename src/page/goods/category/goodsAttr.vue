@@ -46,10 +46,34 @@
             :label="item.name"
           >
           </el-table-column>
+          <el-table-column label="销售价格" width="180">
+            <template slot-scope="scope">
+              <el-input
+                v-model="scope.row.price"
+                placeholder="请输入内容"
+              ></el-input>
+            </template>
+          </el-table-column>
           <el-table-column label="商品库存" width="180">
             <template slot-scope="scope">
               <el-input
-                v-model="scope.row.number"
+                v-model="scope.row.num"
+                placeholder="请输入内容"
+              ></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column label="库存预警值" width="180">
+            <template slot-scope="scope">
+              <el-input
+                v-model="scope.row.alertNum"
+                placeholder="请输入内容"
+              ></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column label="SKU名称" width="180">
+            <template slot-scope="scope">
+              <el-input
+                v-model="scope.row.name"
                 placeholder="请输入内容"
               ></el-input>
             </template>
@@ -129,19 +153,9 @@ export default {
       this.$emit("prev");
     },
     checkboxClick() {
-      this.setSpecTableData();
-      // let specTableColumns = [];
-      // this.specLists.forEach((item, index) => {
-      //   if (item.values.length > 0) {
-      //     specTableColumns.push({
-      //       value: `attr${index}`,
-      //       name: item.name
-      //     });
-      //   }
-      // });
-      // this.specTableColumns = specTableColumns;
+      this._setSpecTableData();
     },
-    setSpecTableData() {
+    _setSpecTableData() {
       let specTableColumns = [];
       let specArrs = this.specLists
         .map((item, index) => {
@@ -160,12 +174,12 @@ export default {
     },
     getFromData() {
       const templateName = this.form.templateName;
-      const aa = {
-        templateName,
-        specLists: this.specLists,
-        paraLists: this.paraLists
-      };
-      console.log(aa);
+      // const aa = {
+      //   templateName,
+      //   specLists: this.specLists,
+      //   paraLists: this.paraLists
+      // };
+      console.log("aa", this.specTableData);
     },
     async findTemplateName() {
       const res = await Request.get("template/category/" + this.categoryId);
@@ -205,7 +219,7 @@ export default {
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
 .form {
-  width: 800px;
+  width: 1000px;
   margin: 40px auto;
   .edit-btn {
     color: blue;
