@@ -172,14 +172,23 @@ export default {
       this.specTableColumns = specTableColumns;
       this.specTableData = combinationCalculate(specArrs);
     },
+    setSpec() {
+      this.specTableData.forEach(sItem => {
+        let spec = {};
+        for (let k in sItem) {
+          this.specTableColumns.forEach(item => {
+            if (item.value === k) {
+              spec[item.name] = sItem[k];
+            }
+          });
+        }
+        sItem.spec = JSON.stringify(spec);
+      });
+    },
     getFromData() {
       const templateName = this.form.templateName;
-      // const aa = {
-      //   templateName,
-      //   specLists: this.specLists,
-      //   paraLists: this.paraLists
-      // };
-      console.log("aa", this.specTableData);
+      this.setSpec();
+      console.log("aa", templateName, this.specTableData);
     },
     async findTemplateName() {
       const res = await Request.get("template/category/" + this.categoryId);
