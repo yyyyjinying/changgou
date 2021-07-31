@@ -34,7 +34,7 @@ import { Request } from "common/utils";
 export default {
   data() {
     return {
-      active: 2,
+      active: 0,
       categoryIdArrs: [
         // 设置初始值用于调试
         { id: 558, name: "手机" },
