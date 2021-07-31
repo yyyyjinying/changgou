@@ -1,6 +1,12 @@
 <template>
   <div>
-    <el-form class="form" ref="form" :model="form" label-width="200px">
+    <el-form
+      :rules="rules"
+      class="form"
+      ref="goodsAttrForm"
+      :model="form"
+      label-width="200px"
+    >
       <el-form-item label="规格参数数组">
         <el-input
           v-model="form.templateValue.name"
@@ -9,7 +15,7 @@
       </el-form-item>
       <div>
         <!-- 商品规格 -->
-        <h1>商品规格</h1>
+        <h1><i :style="{ color: 'red' }">*</i>商品规格</h1>
         <el-form-item
           v-for="(item, index) in specLists"
           :label="item.name"
@@ -25,7 +31,12 @@
             ></el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-table border :data="specTableData">
+        <el-table
+          class="spec-table"
+          v-if="specTableData.length > 0"
+          border
+          :data="specTableData"
+        >
           <el-table-column
             v-for="(item, index) in specTableColumns"
             :key="index"
@@ -33,7 +44,11 @@
             :label="item.name"
           >
           </el-table-column>
-          <el-table-column label="销售价格" width="180">
+          <el-table-column
+            :render-header="renderHeader"
+            label="销售价格"
+            width="180"
+          >
             <template slot-scope="scope">
               <el-input
                 v-model="scope.row.price"
@@ -41,7 +56,11 @@
               ></el-input>
             </template>
           </el-table-column>
-          <el-table-column label="商品库存" width="180">
+          <el-table-column
+            :render-header="renderHeader"
+            label="商品库存"
+            width="180"
+          >
             <template slot-scope="scope">
               <el-input
                 v-model="scope.row.num"
@@ -49,7 +68,11 @@
               ></el-input>
             </template>
           </el-table-column>
-          <el-table-column label="库存预警值" width="180">
+          <el-table-column
+            :render-header="renderHeader"
+            label="库存预警值"
+            width="180"
+          >
             <template slot-scope="scope">
               <el-input
                 v-model="scope.row.alertNum"
@@ -80,9 +103,18 @@
         <!-- 商品参数  -->
         <h1>商品参数</h1>
         <el-table border :data="paraLists" style="width: 100%">
-          <el-table-column prop="name" label="参数类型" width="180">
+          <el-table-column
+            :render-header="renderHeader"
+            prop="name"
+            label="参数类型"
+            width="180"
+          >
           </el-table-column>
-          <el-table-column label="录入参数" width="180">
+          <el-table-column
+            :render-header="renderHeader"
+            label="录入参数"
+            width="180"
+          >
             <template slot-scope="scope">
               <el-select v-model="scope.row.value" placeholder="请选择">
                 <template v-if="scope.row.options">
@@ -134,18 +166,71 @@ export default {
       form: {
         templateValue: {},
         introduction: ""
+      },
+      rules: {
+        checkboxSpec: [
+          { required: true, message: "请勾选规格", trigger: "blur" }
+        ],
+        name: [{ required: true, message: "请输入", trigger: "blur" }],
+        caption: [{ required: true, message: "请输入", trigger: "blur" }],
+        sn: [{ required: true, message: "请输入", trigger: "blur" }]
       }
     };
   },
   methods: {
+    renderHeader(h, { column }) {
+      // h即为cerateElement的简写，具体可看vue官方文档
+      return h("div", [h("i", "*"), h("span", column.label)]);
+    },
     deleteClick(row) {
       console.log(row);
     },
     prev() {
       this.$emit("setActive", 1);
     },
+    _vSpec() {
+      let sLock = false;
+      this.specTableData.every(item => {
+        for (let key in item) {
+          if (item[key] === null) {
+            sLock = true;
+          }
+        }
+      });
+      return sLock;
+    },
+    _vPara() {
+      let lock = false;
+      for (let i = 0; i < this.paraLists.length; i++) {
+        if (this.paraLists[i].value === "") {
+          lock = true;
+          break;
+        }
+      }
+      debugger;
+      return lock;
+    },
     submit() {
-      this.$emit("submit", this.getFromData());
+      this.$refs.goodsAttrForm.validate(valid => {
+        if (this.specTableData.length === 0) {
+          this.$message("请勾选规格", "error");
+          return;
+        }
+        if (this._vSpec()) {
+          this.$message("请填写必填项规格", "error");
+          return;
+        }
+        if (this._vPara()) {
+          this.$message("请填写必填项参数", "error");
+          return;
+        }
+        debugger;
+        if (valid) {
+          // this.$emit("submit", this.getFromData());
+        } else {
+          return false;
+        }
+      });
     },
     checkboxClick() {
       this._setSpecTableData();
@@ -165,7 +250,12 @@ export default {
         })
         .filter(item => item.length > 0);
       this.specTableColumns = specTableColumns;
-      this.specTableData = combinationCalculate(specArrs);
+      this.specTableData = combinationCalculate(specArrs, {
+        price: null,
+        num: null,
+        alertNum: null,
+        name: null
+      });
     },
     getSpec() {
       this.specTableData.forEach(sItem => {
@@ -237,6 +327,13 @@ export default {
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
 .form {
+  >>> .el-table th>.cell{
+    i {
+      color: #f00;
+      margin-right: 5px;
+    }
+    text-align :center;
+  }
   width: 1000px;
   margin: 40px auto;
   .edit-btn {

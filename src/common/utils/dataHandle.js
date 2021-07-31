@@ -7,7 +7,7 @@
       ]} attr
  * @returns
  */
-function combinationCalculate(attr) {
+function combinationCalculate(attr, json = {}) {
   let result = [];
   let fn = (i, attr, item = {}) => {
     if (attr[i] && attr[i].length > 0) {
@@ -15,7 +15,7 @@ function combinationCalculate(attr) {
         fn(i + 1, attr, { ...item, ...attr[i][j] });
       }
     } else {
-      result.push(item);
+      result.push({ ...item, ...json });
     }
   };
 
