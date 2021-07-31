@@ -90,12 +90,11 @@
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="100">
             <template slot-scope="scope">
-              <el-button
-                @click="deleteClick(scope.row)"
-                type="text"
-                size="small"
-                >删除</el-button
-              >
+              <el-popconfirm title="确定删除吗？" @confirm="deleteClick(scope)">
+                <el-button slot="reference" type="text" size="small"
+                  >删除</el-button
+                >
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -182,8 +181,10 @@ export default {
       // h即为cerateElement的简写，具体可看vue官方文档
       return h("div", [h("i", "*"), h("span", column.label)]);
     },
-    deleteClick(row) {
-      console.log(row);
+    deleteClick(scope) {
+      this.specTableData = this.specTableData.filter(
+        (item, idx) => idx !== scope.$index
+      );
     },
     prev() {
       this.$emit("setActive", 1);
