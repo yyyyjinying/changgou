@@ -191,13 +191,15 @@ export default {
     },
     _vSpec() {
       let sLock = false;
-      this.specTableData.every(item => {
+      for (let i = 0; i < this.specTableData.length; i++) {
+        const item = this.specTableData[i];
         for (let key in item) {
           if (item[key] === null) {
             sLock = true;
+            return;
           }
         }
-      });
+      }
       return sLock;
     },
     _vPara() {
@@ -208,7 +210,6 @@ export default {
           break;
         }
       }
-      debugger;
       return lock;
     },
     submit() {
@@ -225,9 +226,8 @@ export default {
           this.$message("请填写必填项参数", "error");
           return;
         }
-        debugger;
         if (valid) {
-          // this.$emit("submit", this.getFromData());
+          this.$emit("submit", this.getFromData());
         } else {
           return false;
         }
