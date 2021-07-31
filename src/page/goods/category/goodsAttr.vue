@@ -3,7 +3,7 @@
     <el-form class="form" ref="form" :model="form" label-width="200px">
       <el-form-item label="规格参数数组">
         <el-input
-          v-model="form.templateName"
+          v-model="form.templateValue.name"
           placeholder="请输入内容"
         ></el-input>
       </el-form-item>
@@ -25,19 +25,6 @@
             ></el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <!-- 规格配置 -->
-        <!-- <table border="1">
-          <tr>
-            <template v-for="item in specTableColumns">
-              <th :key="item.value" width="80">{{ item.name }}</th>
-            </template>
-            <th>操作</th>
-          </tr>
-          <tr v-for="(item, index) in specTableData" :key="index">
-            <td v-for="(v, k) in item" :key="k">{{ v }}</td>
-            <td>+</td>
-          </tr>
-        </table> -->
         <el-table border :data="specTableData">
           <el-table-column
             v-for="(item, index) in specTableColumns"
@@ -121,6 +108,10 @@
         <v-editor />
       </div>
     </el-form>
+    <div class="footer">
+      <el-button type="host" @click="prev">上一步</el-button>
+      <el-button type="primary" @click="submit">提交</el-button>
+    </div>
   </div>
 </template>
 <script>
@@ -141,7 +132,8 @@ export default {
       specTableData: [],
       specTableColumns: [],
       form: {
-        templateName: ""
+        templateValue: {},
+        introduction: ""
       }
     };
   },
@@ -150,7 +142,10 @@ export default {
       console.log(row);
     },
     prev() {
-      this.$emit("prev");
+      this.$emit("setActive", 1);
+    },
+    submit() {
+      this.$emit("submit", this.getFromData());
     },
     checkboxClick() {
       this._setSpecTableData();
@@ -172,7 +167,7 @@ export default {
       this.specTableColumns = specTableColumns;
       this.specTableData = combinationCalculate(specArrs);
     },
-    setSpec() {
+    getSpec() {
       this.specTableData.forEach(sItem => {
         let spec = {};
         for (let k in sItem) {
@@ -184,16 +179,30 @@ export default {
         }
         sItem.spec = JSON.stringify(spec);
       });
+      return this.specTableData;
+    },
+    getParaStr() {
+      let para = {};
+      this.paraLists.forEach(item => {
+        para[item.name] = item.value;
+      });
+      return JSON.stringify(para);
     },
     getFromData() {
-      const templateName = this.form.templateName;
-      this.setSpec();
-      console.log("aa", templateName, this.specTableData);
+      const templateId = this.form.templateValue.id;
+      const skuList = this.getSpec();
+      const paraItems = this.getParaStr();
+      return {
+        templateId,
+        skuList,
+        paraItems,
+        introduction: this.form.introduction
+      };
     },
     async findTemplateName() {
       const res = await Request.get("template/category/" + this.categoryId);
       if (res.data.code === 20000) {
-        this.templateName = res.data.data.name;
+        this.form.templateValue = res.data.data;
       }
     },
     async findParaLists() {
@@ -241,5 +250,9 @@ export default {
           height: 60px;
       }
   }
+
+}
+.footer{
+  text-align:center;
 }
 </style>

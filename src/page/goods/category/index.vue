@@ -5,61 +5,70 @@
       <el-step title="填写商品信息"></el-step>
       <el-step title="填写商品属性"></el-step>
     </el-steps>
-    <c-menu v-if="active == 0" @setCategoryIdArrs="setCategoryIdArrs" />
+    <c-menu
+      @setActive="setActive"
+      v-if="active == 0"
+      @setCategoryIdArrs="setCategoryIdArrs"
+    />
     <base-info
       v-if="active == 1"
-      @prev="prev"
+      @setActive="setActive"
       :categoryIdArrs="categoryIdArrs"
+      @setBaseInfo="setBaseInfo"
       ref="baseInfoRef"
     />
     <goods-attr
+      @setActive="setActive"
+      @submit="submit"
       ref="goodsAttrRef"
       v-if="active == 2"
       :categoryId="categoryIdArrs[2].id"
     />
-    <div class="footer">
-      <el-button v-if="active !== 0" type="host" @click="prev"
-        >上一步</el-button
-      >
-      <el-button type="primary" @click="next">下一步</el-button>
-    </div>
   </div>
 </template>
 <script>
 import CMenu from "./cMenu";
 import BaseInfo from "./baseInfo";
 import GoodsAttr from "./goodsAttr";
+import { Request } from "common/utils";
 export default {
   data() {
     return {
-      active: 2,
+      active: 0,
       categoryIdArrs: [
         // 设置初始值用于调试
         { id: 558, name: "手机" },
         { id: 559, name: "手机通讯 " },
         { id: 560, name: "手机" }
       ],
-      baseInfo: {}, // spu数据
-      goodsAttr: {} // sku数据
+      baseInfo: {} // spu数据
     };
   },
   methods: {
-    next() {
-      if (this.active === 2) {
-        this.goodsAttr = this.$refs.goodsAttrRef.getFromData();
-        return;
-      }
-      if (this.active === 1) {
-        this.baseInfo = this.$refs.baseInfoRef.getFromData();
-      }
-      this.active = this.active + 1;
-    },
-    prev() {
-      if (this.active === 0) return;
-      this.active = this.active - 1;
-    },
     setCategoryIdArrs(params) {
       this.categoryIdArrs = params;
+    },
+    setBaseInfo(data) {
+      this.baseInfo = data;
+    },
+    setActive(active) {
+      this.active = active;
+    },
+    async submit(goodsAttr) {
+      const { templateId, skuList, paraItems } = goodsAttr;
+      const res = await Request.post("spu/save", {
+        spu: { ...this.baseInfo, templateId, paraItems },
+        skuList: skuList.map(item => {
+          item.sn = this.baseInfo.sn;
+          return item;
+        })
+      });
+      if (res.data.code === 20000) {
+        this.$message({
+          message: "保存成功",
+          type: "success"
+        });
+      }
     }
   },
   components: {
