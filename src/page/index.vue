@@ -37,7 +37,8 @@ export default {
               name: "商品列表",
               children: [
                 {
-                  name: "商品列表"
+                  name: "商品列表",
+                  path: "/goods/list"
                 },
                 {
                   name: "商品日志"
@@ -46,21 +47,7 @@ export default {
             },
             {
               name: "添加商品",
-              path: "goods",
-              children: [
-                {
-                  name: "选择商品分类",
-                  path: "/goods/category"
-                },
-                {
-                  name: "填写商品信息",
-                  path: "/goods/baseInfo"
-                },
-                {
-                  name: "填写商品属性",
-                  path: "/goods/attr"
-                }
-              ]
+              path: "/goods/add"
             },
             {
               name: "商品分类",

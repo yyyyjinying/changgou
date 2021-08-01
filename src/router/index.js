@@ -2,10 +2,8 @@ import Vue from "vue";
 import Router from "vue-router";
 import Page from "@/page";
 import Home from "@/page/start.vue";
-// import Goods from "@/page/goods/index.vue";
-import Category from "@/page/goods/category/index.vue";
-import BaseInfo from "@/page/goods/baseInfo";
-import Attr from "@/page/goods/attr";
+import AddGoods from "@/page/goods/category/index.vue";
+import ListGoods from "@/page/goods/list/index.vue";
 import subRouter from "./subRouter.vue";
 
 Vue.use(Router);
@@ -29,16 +27,12 @@ export default new Router({
       component: subRouter,
       children: [
         {
-          path: "category",
-          component: Category
+          path: "add",
+          component: AddGoods
         },
         {
-          path: "baseInfo",
-          component: BaseInfo
-        },
-        {
-          path: "attr",
-          component: Attr
+          path: "list",
+          component: ListGoods
         }
       ]
     }

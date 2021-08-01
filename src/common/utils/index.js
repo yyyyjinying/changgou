@@ -1,4 +1,4 @@
 import Request from "./request";
-import { combinationCalculate } from "./dataHandle";
+import { parseJSON, combinationCalculate } from "./dataHandle";
 
-export { Request, combinationCalculate };
+export { Request, parseJSON, combinationCalculate };

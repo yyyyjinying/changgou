@@ -22,4 +22,8 @@ function combinationCalculate(attr, json = {}) {
   fn(0, attr, {});
   return result;
 }
-export { combinationCalculate };
+
+const parseJSON = value => {
+  return JSON.parse(value.replace(/(')/g, '"'));
+};
+export { combinationCalculate, parseJSON };
