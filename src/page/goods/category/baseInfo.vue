@@ -103,6 +103,33 @@ export default {
         }
       });
     },
+    async findSpuRquest(id) {
+      const res = await Request.get("spu/" + id);
+      if (res.data.code === 20000) {
+        const {
+          name,
+          caption,
+          brandId,
+          introduction,
+          freightId,
+          saleService,
+          sn,
+          paraItems
+        } = res.data.data.spu;
+        this.brandOptions = res.data.data.brandLists;
+        this.$emit("setCategoryIdArrs", res.data.data.categoryIdName);
+        this.$emit("setParaItems", paraItems);
+        this.form = {
+          name,
+          caption,
+          brandId,
+          introduction,
+          freightId,
+          saleService: saleService.split(","),
+          sn
+        };
+      }
+    },
     getFromData() {
       const category1Id = this.categoryIdArrs[0].id;
       const category2Id = this.categoryIdArrs[1].id;
@@ -116,8 +143,13 @@ export default {
         category3Id
       };
     },
-    async findBrandByCategory() {
-      const id = this.categoryIdArrs[2] && this.categoryIdArrs[2].id;
+    async findBrandByCategory(categoryId) {
+      let id = "";
+      if (categoryId) {
+        id = categoryId;
+      } else {
+        id = this.categoryIdArrs[2] && this.categoryIdArrs[2].id;
+      }
       const res = await Request.get("brand/category/" + id);
       if (res.data.code === 20000) {
         this.brandOptions = res.data.data;
@@ -125,8 +157,12 @@ export default {
     }
   },
   mounted() {
-    console.log("baseInfo");
-    this.findBrandByCategory();
+    const id = this.$route.query.id;
+    if (id) {
+      this.findSpuRquest(id);
+    } else {
+      this.findBrandByCategory();
+    }
   }
 };
 </script>

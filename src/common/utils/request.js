@@ -1,4 +1,5 @@
 import axios from "axios";
+axios.create({});
 
 const getUrl = url => {
   return "http://localhost:18081/" + url;

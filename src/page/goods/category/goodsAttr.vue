@@ -146,7 +146,7 @@
   </div>
 </template>
 <script>
-import { Request, combinationCalculate } from "common/utils";
+import { Request, parseJSON, combinationCalculate } from "common/utils";
 import VEditor from "common/components/base/vEditor";
 
 export default {
@@ -154,12 +154,16 @@ export default {
     categoryId: {
       type: Number,
       default: 560
+    },
+    paraItems: {
+      type: String,
+      default: "{}"
     }
   },
   data() {
     return {
-      specLists: [],
       paraLists: [],
+      specLists: [],
       specTableData: [],
       specTableColumns: [],
       form: {
@@ -251,6 +255,7 @@ export default {
         })
         .filter(item => item.length > 0);
       this.specTableColumns = specTableColumns;
+      console.log("specArrs", specArrs);
       this.specTableData = combinationCalculate(specArrs, {
         price: null,
         num: null,
@@ -313,6 +318,79 @@ export default {
           return item;
         });
       }
+    },
+    async findSkuLists(spuId) {
+      const res = await Request.post("sku/search", {
+        spuId,
+        categoryId: this.categoryId
+      });
+      if (res.data.code === 20000) {
+        const list = res.data.data.sku;
+        const specList = res.data.data.specList;
+        const paraLists = res.data.data.paraList;
+        const specValues = list.map(item => JSON.parse(item.spec));
+
+        /**
+         * 初始化paraLists
+         */
+        const paraItems = parseJSON(this.paraItems); // {"出厂年份":"2001","版本":"10"}
+        paraLists.forEach(item => {
+          if (item.name in paraItems) item.value = paraItems[item.name];
+        });
+        this.paraLists = paraLists;
+
+        /**
+         * 初始化specLists
+         */
+        let map = new Map();
+        specValues.forEach(item => {
+          for (let key in item) {
+            if (!map.has(key)) {
+              map.set(key, [item[key]]);
+            } else {
+              if (!map.get(key).includes(item[key])) {
+                map.get(key).push(item[key]);
+              }
+            }
+          }
+        });
+        specList.forEach(item => {
+          item.values = map.has(item.name) ? map.get(item.name) : [];
+        });
+        this.specLists = specList;
+
+        /**
+         * 初始化specTableColumns
+         */
+        const columns = [];
+        let index = 0;
+        for (let key in specValues[0]) {
+          columns.push({ name: key, value: `attr${index}` });
+          index++;
+        }
+        this.specTableColumns = columns;
+
+        /**
+         * 初始化specTableData
+         */
+        let specArrs = [];
+        specValues.forEach(item => {
+          let record = {};
+          this.specTableColumns.forEach(cItem => {
+            if (cItem.name in item) {
+              record[cItem.value] = item[cItem.name];
+            }
+          });
+          specArrs.push(record);
+        });
+        specArrs.forEach((sItem, index) => {
+          sItem.price = list[index].price;
+          sItem.num = list[index].num;
+          sItem.alertNum = list[index].alertNum;
+          sItem.name = list[index].name;
+        });
+        this.specTableData = specArrs;
+      }
     }
   },
   components: {
@@ -320,9 +398,14 @@ export default {
   },
 
   mounted() {
-    this.findSpecLists();
-    this.findTemplateName();
-    this.findParaLists();
+    const id = this.$route.query.id;
+    if (id) {
+      this.findSkuLists(id);
+    } else {
+      this.findSpecLists();
+      this.findTemplateName();
+      this.findParaLists();
+    }
   }
 };
 </script>

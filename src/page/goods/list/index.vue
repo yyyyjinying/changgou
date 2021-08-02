@@ -4,6 +4,9 @@
       <el-form-item label="商品名称">
         <el-input v-model="listForm.name"></el-input>
       </el-form-item>
+      <el-form-item label="货号">
+        <el-input v-model="listForm.sn"></el-input>
+      </el-form-item>
       <el-form-item label="商品品牌">
         <el-select v-model="listForm.brandId" placeholder="请选择">
           <el-option
@@ -43,11 +46,7 @@
       </el-table-column>
       <el-table-column label="SKU库存" width="150">
         <template slot-scope="scope">
-          <el-button
-            @click.native.prevent="skuEdit(scope.row)"
-            type="text"
-            size="small"
-          >
+          <el-button @click="skuEdit(scope.row)" type="text" size="small">
             编辑
           </el-button>
         </template>
@@ -60,16 +59,12 @@
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="140">
         <template slot-scope="scope">
-          <el-button
-            @click.native.prevent="deleteRow(scope.$index, tableData)"
-            type="text"
-            size="small"
-          >
+          <el-button @click="editRoute(scope.row)" type="text" size="small">
             编辑
           </el-button>
           <el-divider direction="vertical"></el-divider>
           <el-button
-            @click.native.prevent="deleteRow(scope.$index, tableData)"
+            @click="deleteRow(scope.$index, tableData)"
             type="text"
             size="small"
           >
@@ -77,7 +72,7 @@
           </el-button>
           <el-divider direction="vertical"></el-divider>
           <el-button
-            @click.native.prevent="deleteRow(scope.$index, tableData)"
+            @click="deleteRow(scope.$index, tableData)"
             type="text"
             size="small"
           >
@@ -107,6 +102,7 @@ export default {
       listData: [],
       listForm: {
         name: "",
+        sn: "",
         brandId: ""
       },
       brandOptions: [],
@@ -137,6 +133,14 @@ export default {
       }
       this.pagination.pageNum = 1;
       this.search();
+    },
+    editRoute(record) {
+      this.$router.push({
+        path: "/goods/edit",
+        query: { active: 1, id: record.id }
+      });
+      // this.$router.push({ name: "goods/edit", params: { id: "123" } });
+      // this.$router.push(,p); // http://localhost:8080/?#/goods/add
     },
     async listRequest(params = {}) {
       const { pageNum, pageSize } = this.pagination;

@@ -31,6 +31,10 @@ export default new Router({
           component: AddGoods
         },
         {
+          path: "edit",
+          component: AddGoods
+        },
+        {
           path: "list",
           component: ListGoods
         }

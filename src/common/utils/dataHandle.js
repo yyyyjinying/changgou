@@ -24,6 +24,6 @@ function combinationCalculate(attr, json = {}) {
 }
 
 const parseJSON = value => {
-  return JSON.parse(value.replace(/(')/g, '"'));
+  return value ? JSON.parse(value.replace(/(')/g, '"')) : "{}";
 };
 export { combinationCalculate, parseJSON };

@@ -14,7 +14,9 @@
       v-if="active == 1"
       @setActive="setActive"
       :categoryIdArrs="categoryIdArrs"
+      @setCategoryIdArrs="setCategoryIdArrs"
       @setBaseInfo="setBaseInfo"
+      @setParaItems="setParaItems"
       ref="baseInfoRef"
     />
     <goods-attr
@@ -23,6 +25,7 @@
       ref="goodsAttrRef"
       v-if="active == 2"
       :categoryId="categoryIdArrs[2].id"
+      :paraItems="paraItems"
     />
   </div>
 </template>
@@ -35,16 +38,31 @@ export default {
   data() {
     return {
       active: 0,
+      paraItems: "",
       categoryIdArrs: [
         // 设置初始值用于调试
-        { id: 558, name: "手机" },
-        { id: 559, name: "手机通讯 " },
-        { id: 560, name: "手机" }
+        // { id: 558, name: "手机" },
+        // { id: 559, name: "手机通讯 " },
+        // { id: 560, name: "手机" }
       ],
       baseInfo: {} // spu数据
     };
   },
+  mounted() {
+    this.initActive();
+  },
   methods: {
+    initActive() {
+      const active = this.$route.query.active;
+      if (active) {
+        this.setActive(Number(active));
+      } else {
+        this.setActive(0);
+      }
+    },
+    setParaItems(paraItems) {
+      this.paraItems = paraItems;
+    },
     setCategoryIdArrs(params) {
       this.categoryIdArrs = params;
     },
@@ -56,8 +74,9 @@ export default {
     },
     async submit(goodsAttr) {
       const { templateId, skuList, paraItems } = goodsAttr;
+      const id = this.$route.query.id;
       const res = await Request.post("spu/save", {
-        spu: { ...this.baseInfo, templateId, paraItems },
+        spu: { id, ...this.baseInfo, templateId, paraItems },
         skuList: skuList.map(item => {
           item.sn = this.baseInfo.sn;
           return item;
