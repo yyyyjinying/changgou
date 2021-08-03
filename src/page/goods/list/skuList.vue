@@ -62,7 +62,7 @@
   </el-dialog>
 </template>
 <script>
-import { Request, parseJSON } from "common/utils";
+import { Request } from "common/utils";
 export default {
   data() {
     return {

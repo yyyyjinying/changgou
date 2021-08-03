@@ -39,12 +39,7 @@ export default {
     return {
       active: 0,
       paraItems: "",
-      categoryIdArrs: [
-        // 设置初始值用于调试
-        // { id: 558, name: "手机" },
-        // { id: 559, name: "手机通讯 " },
-        // { id: 560, name: "手机" }
-      ],
+      categoryIdArrs: [],
       baseInfo: {} // spu数据
     };
   },
