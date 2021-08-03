@@ -19,7 +19,7 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <el-table border :data="listData">
+    <el-table border :data="specTableData">
       <el-table-column label="SKU编码" width="250">
         <template slot-scope="scope">
           <el-input v-model="scope.row.name"></el-input>
@@ -57,7 +57,7 @@
     </el-table>
     <span slot="footer" class="footer">
       <el-button @click="setVisible(false)">取 消</el-button>
-      <el-button type="primary" @click="setVisible(false)">确 定</el-button>
+      <el-button type="primary" @click="submit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -67,23 +67,30 @@ export default {
   data() {
     return {
       formData: {
-        categoryId: "",
         sn: "",
+        spuId: "",
         name: ""
       },
-      listData: [],
+      specTableData: [],
       specTableColumns: [],
       dialogTableVisible: false
     };
   },
   methods: {
+    async submit() {
+      const res = await Request.post("sku/saveSkuSpec", this.specTableData);
+      if (res.data.code === 20000) {
+        this.$message(res.data.message, "success");
+        this.setVisible(false);
+      }
+    },
     setVisible(bol = true, record) {
       this.dialogTableVisible = bol;
 
       if (bol) {
-        const { category3Id, sn } = record;
+        const { id, sn } = record;
         this.formData.sn = sn;
-        this.formData.categoryId = category3Id;
+        this.formData.spuId = id;
         this.search();
       } else {
         this.reset();
@@ -94,27 +101,43 @@ export default {
         this.formData[key] = "";
       }
     },
-    setColumn() {
-      this.specTableColumns = [];
-      let specJson = this.listData[0] ? this.listData[0].spec : "{}";
-      let spec = parseJSON(specJson);
-      let index = 0;
-      for (let key in spec) {
-        this.specTableColumns.push({ name: key, value: "attr" + index++ });
-      }
-    },
     async search() {
-      const res = await Request.post(`sku/search`, this.formData);
+      const res = await Request.post("sku/skuList", this.formData);
       if (res.data.code === 20000) {
-        this.listData = res.data.data;
-        this.listData.forEach(item => {
-          let spec = parseJSON(item.spec);
-          let index = 0;
-          for (let key in spec) {
-            item["attr" + index++] = spec[key];
-          }
+        const list = res.data.data;
+        const specValues = list.map(item => JSON.parse(item.spec));
+        /**
+         * 初始化specTableColumns
+         */
+        const columns = [];
+        let index = 0;
+        for (let key in specValues[0]) {
+          columns.push({ name: key, value: `attr${index}` });
+          index++;
+        }
+        this.specTableColumns = columns;
+
+        /**
+         * 初始化specTableData
+         */
+        let specArrs = [];
+        specValues.forEach(item => {
+          let record = {};
+          this.specTableColumns.forEach(cItem => {
+            if (cItem.name in item) {
+              record[cItem.value] = item[cItem.name];
+            }
+          });
+          specArrs.push(record);
         });
-        this.setColumn();
+        specArrs.forEach((sItem, index) => {
+          sItem.price = list[index].price;
+          sItem.num = list[index].num;
+          sItem.alertNum = list[index].alertNum;
+          sItem.name = list[index].name;
+          sItem.id = list[index].id;
+        });
+        this.specTableData = specArrs;
       }
     }
   }
