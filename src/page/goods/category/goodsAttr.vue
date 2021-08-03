@@ -328,8 +328,12 @@ export default {
         const list = res.data.data.sku;
         const specList = res.data.data.specList;
         const paraLists = res.data.data.paraList;
+        const template = res.data.data.template;
         const specValues = list.map(item => JSON.parse(item.spec));
-
+        /**
+         * 初始化规格参数数组
+         */
+        this.form.templateValue = template;
         /**
          * 初始化paraLists
          */

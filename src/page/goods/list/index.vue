@@ -71,13 +71,14 @@
             查看
           </el-button>
           <el-divider direction="vertical"></el-divider>
-          <el-button
-            @click="deleteRow(scope.$index, tableData)"
-            type="text"
-            size="small"
+          <el-popconfirm
+            title="确定删除吗？"
+            @confirm="deleteHandle(scope.row, scope.$index)"
           >
-            移除
-          </el-button>
+            <el-button type="text" size="small" slot="reference">
+              移除
+            </el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -114,6 +115,13 @@ export default {
     };
   },
   methods: {
+    async deleteHandle(record, index) {
+      const res = await Request.delete("spu/" + record.id);
+      if (res.data.code === 20000) {
+        this.$message(res.data.message, "success");
+        this.listData = this.listData.filter((item, idx) => idx !== index);
+      }
+    },
     skuEdit(record) {
       this.$refs.skuRef.setVisible(true, record);
     },

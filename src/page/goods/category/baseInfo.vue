@@ -18,7 +18,7 @@
     <el-form-item label="副标题" prop="caption">
       <el-input v-model="form.caption" placeholder="请输入副标题"></el-input>
     </el-form-item>
-    <el-form-item label="商品品牌">
+    <el-form-item label="商品品牌" prop="brandId">
       <el-select v-model="form.brandId" placeholder="请选择品牌">
         <template v-if="brandOptions.length > 0">
           <el-option
@@ -30,7 +30,7 @@
         </template>
       </el-select>
     </el-form-item>
-    <el-form-item label="商品介绍">
+    <el-form-item label="商品介绍" prop="introduction">
       <el-input type="textarea" v-model="form.introduction"></el-input>
     </el-form-item>
     <el-form-item label="运费模版">
@@ -85,6 +85,8 @@ export default {
       rules: {
         name: [{ required: true, message: "请输入", trigger: "blur" }],
         caption: [{ required: true, message: "请输入", trigger: "blur" }],
+        brandId: [{ required: true, message: "请输入", trigger: "blur" }],
+        introduction: [{ required: true, message: "请输入", trigger: "blur" }],
         sn: [{ required: true, message: "请输入", trigger: "blur" }]
       }
     };
